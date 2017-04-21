@@ -23,12 +23,12 @@ THREADFUNCDLL_API void StartStreamingPull(devices device);
 // When complete, PopCommand will return CALIBRATION_COMPLETE or ERROR_CALIBRATION_FAILED.
 THREADFUNCDLL_API void StartCalibrationPull(devices device);
 
-// Checks for any unread status mesages.
+// Checks for any unread status messages.
 THREADFUNCDLL_API int HasNewCommand(devices device);
 
-// Pops the latest status messages. It is reccomended to handle the following accordingly:
-// This should be polled while the devuice is streaming.
-// DEVICE_CONNECTED : Will be called on StartStreamingThread if the devcice is connected. Start polling.
+// Pops the latest status messages. It is recommended to handle the following accordingly:
+// This should be polled while the device is streaming.
+// DEVICE_CONNECTED : Will be called on StartStreamingThread if the device is connected. Start polling.
 // DEVICE_DISCONNECTED : Will be called on StartStreamingThread if there is no device or on abrupt disconnect.
 // RESET_ORIENTATION : Adjust the user's avatar to the baseline ex. standing straight.
 // CALIBRATION_COMPLETE : Allow streaming.
@@ -37,7 +37,8 @@ THREADFUNCDLL_API int HasNewCommand(devices device);
 THREADFUNCDLL_API int PopCommand(devices device);
 
 // Loads the latest rotation values into a buffer. outData must be 5 elements long.
-// This should be polled while the devuice is streaming.
+// This should be polled while the device is streaming.
+// The rotation data should be parsed by dividing the signed bytes by 127.5; See UNPACK_ENFL_QUAT_T.
 THREADFUNCDLL_API void LoadRotations(devices device, enfl_quat_t* outData);
 
 // Stops the device from streaming data and puts it to sleep.

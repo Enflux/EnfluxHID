@@ -12,8 +12,16 @@
 // Version 2 : Increase maximum number of frames. Change storage format of Base Shirt/Pants Orientations.
 #define RECORDING_HEADER_VERSION 2
 // Version 1 : Roll Pitch Yaw packets
-// Version 2 : Use quaternions instead of euler angle packets
+// Version 2 : Use quaternions instead of Euler angle packets
 #define RECORDING_FRAME_VERSION 2
+
+typedef struct
+{
+    int16_t x;
+    int16_t y;
+    int16_t z;
+} enfl_recording_vector3;
+
 
 #pragma pack (push)
 #pragma pack (1)
@@ -32,9 +40,9 @@ typedef struct
     // duration of the recording in milliseconds
     uint32_t duration;
     // Orientation used in the viewer as the base initial heading of the shirt
-    enfl_vector_t shirt_base_orientation;
+    enfl_recording_vector3 shirt_base_orientation;
     // Orientation used in the viewer as the base initial heading of the pants
-    enfl_vector_t pants_base_orientation;
+    enfl_recording_vector3 pants_base_orientation;
 } enfl_recording_header;
 #pragma pack (pop)
 

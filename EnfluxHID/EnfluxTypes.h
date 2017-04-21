@@ -4,21 +4,13 @@
  * located at: https://www.getenflux.com/pages/sdk-eula
  */
 
-/*
-This file of HID commands is to be shared between the firmware and SDk
- */
+
+// Contains the Enflux enumerations and data types
 
 #ifndef BLE_ENFLUX_H__
 #define BLE_ENFLUX_H__
 
- // Calculate calibration on the host and send it back through an output report
- //#define OUTPUT_CALIBRATION
-
 #include "stdint.h"
-
-#ifdef NRF52
-#include "boards.h"
-#endif
 
 typedef enum
 {
@@ -108,24 +100,32 @@ typedef enum
     ERROR_CALIBRATION_FAILED = -3
 } enfl_inputs_cmd;
 
-// SDK supplements to enflux device codes
+// SDK supplements to Enflux device codes
 typedef enum
 {
     DEVICE_CONNECTED = 128,
     DEVICE_DISCONNECTED = 129,
 } sdk_inputs_cmd;
 
-// Vector type.
+// Vector unit used in raw data packets
 typedef union
 {
     struct
     {
-        int16_t x;
-        int16_t y;
         int16_t z;
+        int16_t y;
+        int16_t x;
     };
-    uint8_t data[6];
+
+    uint8_t data[3];
 } enfl_vector_t;
+
+typedef struct
+{
+    float x;
+    float y;
+    float z;
+} enfl_vector3f;
 
 // A collection of all the raw data received from the sensor with a timestamp in milliseconds.
 typedef struct
@@ -141,40 +141,36 @@ typedef struct
 // Quaternion rotation.
 typedef struct
 {
-    uint8_t w;
-    uint8_t x;
-    uint8_t y;
-    uint8_t z;
+    int8_t w;
+    int8_t x;
+    int8_t y;
+    int8_t z;
 } enfl_quat_t;
 
 typedef enfl_quat_t enfl_rotations[ENFL_SENSOR_COUNT];
 
-// 3DOF vector.
 typedef struct
 {
-    float x;
-    float y;
-    float z;
-} enfl_float_vector_t;
+    // Garment of type enum devices. 0 : Shirt, 1 : Pants
+    uint16_t garment;
+    // Sensor of type enum enfl_sensor
+    uint16_t sensor;
+    // Rolling timestamp in milliseconds, range [0,4095]
+    uint16_t timestamp;
+    // meters / second squared
+    enfl_vector3f acc;
+    // radians / second
+    enfl_vector3f gyro;
+    // tesla
+    enfl_vector3f mag;
+} enfl_engineering_data_t;
 
-// A 3x3 matrix.
-typedef struct
-{
-    float data[3][3];
-} enfl_matrix3;
+// This should map to most quaternion types with structure {w,x,y,z}
+// Or can be unpacked to a 4 value array of real numbers such as double[4]
+#define UNPACK_ENFL_QUAT_T(quat) {(1.0 * (quat.w) / 127.5), \
+                           (1.0 * (quat.x) / 127.5), \
+                           (1.0 * (quat.y) / 127.5), \
+                           (1.0 * (quat.z) / 127.5)}
 
-// A computed calibration for a sensor.
-typedef struct
-{
-    union
-    {
-        struct
-        {
-            enfl_float_vector_t V;
-            enfl_matrix3 W;
-        };
-        uint8_t data_pkts[4][12]; // Sent in 4 blocks in OUTPUT_REPORT_CALIBRATION.
-    };
-} enfl_calibration_t;
 
 #endif

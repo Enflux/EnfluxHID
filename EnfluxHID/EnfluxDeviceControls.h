@@ -26,11 +26,13 @@
 // For most uses of the SDK, just the following is sufficient:
 // A callback to data streams
 // Passing the callback to StartStreamingThread
-// It is necesary for the app to call EndStreamingThread or the device will waste battery.
+// It is necessary for the app to call EndStreamingThread or the device will waste battery.
 
-// The callback is sent a byte array of ...
+// The rotation data should be parsed by dividing the signed bytes by 127.5; See UNPACK_ENFL_QUAT_T.
 typedef void (CALLBACK *streamingReportCallback)(devices dev, enfl_quat_t[5]);
+// The status is defined in enumeration enfl_inputs_cmd.
 typedef void (CALLBACK *deviceStatusCallback)(devices dev, int status);
+
 typedef void (CALLBACK *rawdataReportCallback)(devices dev, int sensor, enfl_raw_data_t* data);
 typedef struct
 {
@@ -48,7 +50,7 @@ THREADFUNCDLL_API int EndStreamingThread();
 
 // The following region is used to stream raw data.
 // The sensors will stream back raw sensor values.
-// The sensor will cycle once every five input reports, significantly increasing the latency.
+// The sensors will report raw data sequentially.
 #pragma region ENFL_RAWDATA
 
 typedef struct
@@ -59,9 +61,6 @@ typedef struct
 
 THREADFUNCDLL_API void StartRawDataThread(devices device, RawDataCallbacks raw_callbacks);
 #pragma endregion
-
-// The following functions are useful for a pull interface and advanced SDK usage.
-#pragma region ENFL_ADVANCED_SDK
 
 typedef struct
 {
@@ -90,14 +89,3 @@ THREADFUNCDLL_API int SetFlags(devices device, bool streaming, bool isRawData, b
 THREADFUNCDLL_API int StartRecording(char* filename);
 
 THREADFUNCDLL_API int EndRecording();
-
-#ifdef ADDRESS_REPORT //removed for HID driver error issue
-// Returns the MAC address of the device.
-THREADFUNCDLL_API int GetAddress(devices dev, uint8_t* buffer);
-#endif
-
-#ifdef OUTPUT_CALIBRATION
-THREADFUNCDLL_API int SetCalibration(devices dev, enfl_calibration_t calibrations[]);
-#endif
-
-#pragma endregion

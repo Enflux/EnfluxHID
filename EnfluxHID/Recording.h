@@ -32,6 +32,6 @@ THREADFUNCDLL_API recording_error_t StartRecording(char* filename);
 
 THREADFUNCDLL_API recording_error_t EndRecording();
 
-THREADFUNCDLL_API recording_error_t SetShirtBaseOrientation(enfl_vector_t orientation);
+THREADFUNCDLL_API recording_error_t SetShirtBaseOrientation(enfl_recording_vector3 orientation);
 
-THREADFUNCDLL_API recording_error_t SetPantsBaseOrientation(enfl_vector_t orientation);
+THREADFUNCDLL_API recording_error_t SetPantsBaseOrientation(enfl_recording_vector3 orientation);

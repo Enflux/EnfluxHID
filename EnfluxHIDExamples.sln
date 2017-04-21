@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EnfluxHID", "EnfluxHID", "{
 		EnfluxHID\EnfluxPullInterface.h = EnfluxHID\EnfluxPullInterface.h
 		EnfluxHID\EnfluxRecordingTypes.h = EnfluxHID\EnfluxRecordingTypes.h
 		EnfluxHID\EnfluxTypes.h = EnfluxHID\EnfluxTypes.h
+		EnfluxHID\ParseEnfluxTypes.h = EnfluxHID\ParseEnfluxTypes.h
 		EnfluxHID\Recording.h = EnfluxHID\Recording.h
 	EndProjectSection
 EndProject

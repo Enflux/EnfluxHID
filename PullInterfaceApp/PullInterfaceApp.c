@@ -9,6 +9,7 @@
 
 #include "stdio.h"
 
+#include "ParseEnfluxTypes.h"
 #include "EnfluxPullInterface.h"
 #include "Recording.h"
 
@@ -25,6 +26,7 @@ int main()
     while (!quit)
     {
         // Input a one character command for each operation.
+        // Press enter to send the command.
         int ch = getchar();
         switch (ch)
         {
@@ -46,8 +48,10 @@ int main()
 
             LoadRotations(devs, rotations);
             // Prints the quaternion as {W,X,Y,Z}
-            printf("New Positon. Center sensor is {%d %d %d %d}",
-                rotations[S_CENTER].w, rotations[S_CENTER].x, rotations[S_CENTER].y, rotations[S_CENTER].z);
+            float center_sensor[4] = UNPACK_ENFL_QUAT_T(rotations[S_CENTER]);
+            // Prints out the quaternion in the format {w,x,y,z}
+            printf("New Positon. Center sensor is {%.02f %.02f %.02f %.02f}",
+                center_sensor[0], center_sensor[1], center_sensor[2], center_sensor[3]);
             break;
         case 'c': // Start calibration
             StartCalibrationPull(devs);
