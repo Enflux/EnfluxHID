@@ -70,15 +70,51 @@ enfl_engineering_data_t ConvertEngineeringUnits(enfl_raw_data_t data, int isShir
     return dest;
 }
 
-// Converts packed Enflux quaternion to Euler angles
-enfl_vector3f QuatToEuler(enfl_quat_t packed_quat)
+// Unpacks our 4 byte packed quaternion into an WXYZ quaternion
+enfl_quat_t UnpackQuaternion(enfl_packed_quat_t quat)
 {
-    double quat[4] = UNPACK_ENFL_QUAT_T(packed_quat);;
+    enfl_quat_t out_quat;
 
-    double w = quat[0];
-    double x = quat[1];
-    double y = quat[2];
-    double z = quat[3];
+    // The SDK zeros out the buffer when there is not rotation. Return zeros to indicate this.
+    if (quat[0] == 0 &&
+        quat[1] == 0 &&
+        quat[2] == 0 &&
+        (quat[3] & 0x3f) == 0) // sensor index is not counted here
+    {
+        out_quat = QUATERNION_INVALID;
+    }
+    else
+    {
+        // The component which is computed
+        uint16_t idx = (quat[3] & 0xc0) >> 6;
+        // Find the component values in range [0,1024], then linear transform to [-1,1]
+        float given[3] =
+        {
+            (((uint16_t)quat[0] | ((quat[3] & 0x0003) << 8)) / 511.5f) - 1.0f,
+            (((uint16_t)quat[1] | ((quat[3] & 0x000c) << 6)) / 511.5f) - 1.0f,
+            (((uint16_t)quat[2] | ((quat[3] & 0x0030) << 4)) / 511.5f) - 1.0f
+        };
+        // Compute the missing component by creating a normalized quaternion
+        float computed = (float)sqrt(1.0 - pow(given[0], 2) - pow(given[1], 2) - pow(given[2], 2));
+
+        // Insert the computed component at index idx as if it were a list.
+        out_quat.data[0] = (idx == 0) ? computed : given[0];
+        out_quat.data[1] = (idx == 1) ? computed : (idx == 0) ? given[0] : given[1];
+        out_quat.data[2] = (idx == 2) ? computed : (idx == 3) ? given[2] : given[1];
+        out_quat.data[3] = (idx == 3) ? computed : given[2];
+    }
+    return out_quat;
+}
+
+// Converts packed Enflux quaternion to Euler angles
+enfl_vector3f QuatToEuler(enfl_packed_quat_t packed_quat)
+{
+    enfl_quat_t quat = UnpackQuaternion(packed_quat);
+
+    double w = quat.w;
+    double x = quat.x;
+    double y = quat.y;
+    double z = quat.z;
 
     float roll = (float)atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y));
     float pitch = (float)asin(2 * (w * y - z * x));

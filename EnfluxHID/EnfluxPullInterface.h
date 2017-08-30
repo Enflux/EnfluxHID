@@ -7,13 +7,24 @@
 
 #include "EnfluxTypes.h"
 
+
+#ifdef WIN32
+#include <Windows.h>
+
+#endif
 #define THREADFUNCDLL_API __declspec(dllexport)
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 // Pull SDK :
 // This API controls the suit for most types of applications.
 // An application is expected to start a streaming loop that polls the device for each update.
 // For the lifetime of the stream, the app should pop commands and load rotations in a polling loop.
 // The applications must end the streaming thread to put the device back to sleep.
+
+THREADFUNCDLL_API void StartIdlePull(devices device);
 
 // Initializes the device in streaming mode.  Status messages will start to be queued.
 // Calling this after the first time will reinitialize the devices.
@@ -36,10 +47,16 @@ THREADFUNCDLL_API int HasNewCommand(devices device);
 // ERROR_CALIBRATION_FAILED : Restart calibration.
 THREADFUNCDLL_API int PopCommand(devices device);
 
-// Loads the latest rotation values into a buffer. outData must be 5 elements long.
+// Loads the latest packed orientation values into a buffer. outData must be 5 elements long.
+// Returns the number of sensors written to outData.
 // This should be polled while the device is streaming.
-// The rotation data should be parsed by dividing the signed bytes by 127.5; See UNPACK_ENFL_QUAT_T.
-THREADFUNCDLL_API void LoadRotations(devices device, enfl_quat_t* outData);
+// The rotation data should be parsed by using the function UnpackQuaternion.
+THREADFUNCDLL_API int LoadRotations(devices device, enfl_packed_quat_t* outData);
+
+// Loads the latest unpacked orientation values into a buffer. out_quats must be 5 elements long.
+// Returns the number of sensors written to outData.
+// This should be polled while the device is streaming.
+THREADFUNCDLL_API int LoadRotationsUnpacked(devices device, enfl_quat_t* out_quats);
 
 // Stops the device from streaming data and puts it to sleep.
 // This is necessary for the device to hold its battery after the application completes.
@@ -52,3 +69,7 @@ THREADFUNCDLL_API int StartRecording(char* filename);
 
 // Ends recording. The file can now be opened for playback.
 THREADFUNCDLL_API int EndRecording();
+
+#ifdef __cplusplus
+}
+#endif
