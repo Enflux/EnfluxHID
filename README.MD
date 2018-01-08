@@ -16,3 +16,7 @@ This API allows the lowest latency for streamed data by using callbacks. The cal
 When starting streaming on a module, pass the callback functions to handle the events.
 The callbacks will be hit on new device status and rotations.
 At the end of the application, end the streaming thread.
+
+## Requirements
+Windows 10
+Microsoft Visual Studio (reccomended)
