@@ -62,14 +62,6 @@ THREADFUNCDLL_API int LoadRotationsUnpacked(devices device, enfl_quat_t* out_qua
 // This is necessary for the device to hold its battery after the application completes.
 THREADFUNCDLL_API int EndStreamingThread();
 
-// Records device rotations to a file.
-// An existing file will be overwritten or a new file will be created at filename.
-// The file format is stored as a series of repeating frames of type enflux_recording_frame
-THREADFUNCDLL_API int StartRecording(char* filename);
-
-// Ends recording. The file can now be opened for playback.
-THREADFUNCDLL_API int EndRecording();
-
 #ifdef __cplusplus
 }
 #endif

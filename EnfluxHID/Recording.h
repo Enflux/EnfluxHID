@@ -32,8 +32,12 @@ extern "C"
 #endif
 recording_error_t CALLBACK RecordFrame(devices device, byte* rotation_data);
 
+// Records device rotations to a file.
+// An existing file will be overwritten or a new file will be created at filename.
+// The file format is stored as a series of repeating frames of type enflux_recording_frame
 THREADFUNCDLL_API recording_error_t StartRecording(char* filename);
 
+// Ends recording. The file can now be opened for playback.
 THREADFUNCDLL_API recording_error_t EndRecording();
 
 THREADFUNCDLL_API recording_error_t SetBaseOrientation(devices device, enfl_correction_t correction);
